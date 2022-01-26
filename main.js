@@ -1,22 +1,25 @@
-img="";
+song="";
 dectect_status="";
 objects = [];
 
 
 function preload(){
-    img=loadImage('baby.jpg');
+    song = loadSound("alarm_breakbeat.mp3");
 }
 
 function setup(){
     canvas=createCanvas(380, 380);
     canvas.center();
+    video = createCapture(VIDEO);
+    video.size(380, 380);
+    video.hide();
     objectDetecter=ml5.objectDetector('cocossd', modelLoaded);
     document.getElementById("status").innerHTML="Status: Dectecting Objects";
 }
 function modelLoaded(){
     console.log("model is Loaded!");
     dectect_status=true;
-    objectDetecter.detect(img, gotResult);
+    objectDetecter.detect(video, gotResult);
 }
 function gotResult(error,results){
     if(error){
@@ -28,7 +31,7 @@ function gotResult(error,results){
 }
 
 function draw(){
-    image(img,0,0, 380, 380);
+    image(video,0,0, 380, 380);
    
     if(dectect_status !="")
     {
@@ -47,6 +50,21 @@ function draw(){
             noFill();
             stroke(r, g, b);
             rect(objects[i].x, objects[i].y, objects[i].width, objects[i].height);
+            if(objects[i].label == "person") {
+                document.getElementById("number_of_objects").innerHTML="Baby Found";
+                console.log("Stop");
+                song.stop();
+            }
+            else{
+                document.getElementById("number_of_objects").innerHTML="Baby Not Found";
+                console.log("Play");
+                song.play();
+            }
+        }
+        if(objects.length == 0){
+            document.getElementById("number_of_objects").innerHTML="Baby Not Found";
+                console.log("Play");
+                song.play();
         }
     }
 }
